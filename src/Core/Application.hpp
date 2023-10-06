@@ -16,8 +16,9 @@ namespace Core
         static Application& GetInstance();
 
     public:
-        void RegisterWindowClass();
-        void UnregisterWindowClass();
+        void RegisterWindowClass() const;
+        void UnregisterWindowClass() const;
+        const char* GetWindowClassName() const;
 
     private:
         inline static Application* s_Instance = nullptr;

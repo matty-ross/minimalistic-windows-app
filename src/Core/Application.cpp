@@ -19,8 +19,8 @@ namespace Core
 
         return *s_Instance;
     }
-    
-    void Application::RegisterWindowClass()
+
+    void Application::RegisterWindowClass() const
     {
         WNDCLASSA wndClass =
         {
@@ -31,9 +31,14 @@ namespace Core
         RegisterClassA(&wndClass);
     }
     
-    void Application::UnregisterWindowClass()
+    void Application::UnregisterWindowClass() const
     {
         HINSTANCE instance = GetModuleHandleA(nullptr);
         UnregisterClassA(k_WindowClassName, instance);
+    }
+
+    const char* Application::GetWindowClassName() const
+    {
+        return k_WindowClassName;
     }
 }
