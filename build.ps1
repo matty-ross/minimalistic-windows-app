@@ -10,11 +10,12 @@ $LinkerOptions =
 "/ENTRY:Start",
 "/SUBSYSTEM:CONSOLE",
 "/DEFAULTLIB:Kernel32.lib",
+"/DEFAULTLIB:User32.lib",
 ""
 
-Remove-Item -Path ".\obj\*"
-& cl.exe $CompilerOptions ".\src\*"
 
+Remove-Item -Path ".\obj\*"
+& cl.exe $CompilerOptions (Get-ChildItem -Path ".\src\*" -Filter "*.cpp" -Recurse -File).FullName
 
 Remove-Item -Path ".\bin\*"
 & link.exe $LinkerOptions ".\obj\*"

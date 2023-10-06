@@ -1,14 +1,12 @@
 #include <Windows.h>
 
-
-constexpr char message[] = "Hello, world!";
-constexpr DWORD messageLength = sizeof(message) - 1;
+#include "Core/Application.hpp"
 
 
 void Start()
 {
-    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-    WriteConsoleA(consoleOutput, message, messageLength, nullptr, nullptr);
+    Core::Application::GetInstance().RegisterWindowClass();
+    Core::Application::GetInstance().UnregisterWindowClass();
 
     ExitProcess(0);
 }
