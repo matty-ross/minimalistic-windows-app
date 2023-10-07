@@ -1,9 +1,5 @@
 #include "Application.hpp"
 
-#include <Windows.h>
-
-#include "../Util/Memory.hpp"
-
 
 namespace Core
 {
@@ -14,7 +10,7 @@ namespace Core
     {
         if (s_Instance == nullptr)
         {
-            s_Instance = static_cast<Application*>(Util::Memory::Allocate(sizeof(*s_Instance)));
+            s_Instance = static_cast<Application*>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*s_Instance)));
         }
 
         return *s_Instance;
@@ -33,8 +29,7 @@ namespace Core
     
     void Application::UnregisterWindowClass() const
     {
-        HINSTANCE instance = GetModuleHandleA(nullptr);
-        UnregisterClassA(k_WindowClassName, instance);
+        UnregisterClassA(k_WindowClassName, GetModuleHandleA(nullptr));
     }
 
     const char* Application::GetWindowClassName() const
