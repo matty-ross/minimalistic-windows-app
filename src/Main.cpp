@@ -11,7 +11,7 @@ void Start()
     {
         Core::Window mainWindow(
             {
-                .Name   = "Test",
+                .Name   = "Windows App",
                 .Style  = WS_OVERLAPPEDWINDOW,
                 .X      = 100,
                 .Y      = 100,

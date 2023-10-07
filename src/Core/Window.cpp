@@ -40,7 +40,7 @@ void Core::Window::Show() const
 bool Core::Window::ProcessMessage() const
 {
     MSG msg = {};
-    PeekMessageA(&msg, m_WindowHandle, 0, 0, PM_REMOVE);
+    PeekMessageA(&msg, nullptr, 0, 0, PM_REMOVE);
     TranslateMessage(&msg);
     DispatchMessageA(&msg);
 
