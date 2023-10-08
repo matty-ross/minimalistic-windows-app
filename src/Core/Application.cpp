@@ -6,6 +6,9 @@ namespace Core
     static constexpr char k_WindowClassName[] = "WindowsAppWindowClass";
 
 
+    Application Application::s_Instance;
+
+
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     {
         switch (Msg)
@@ -23,12 +26,7 @@ namespace Core
     
     Application& Application::GetInstance()
     {
-        if (s_Instance == nullptr)
-        {
-            s_Instance = static_cast<Application*>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*s_Instance)));
-        }
-
-        return *s_Instance;
+        return s_Instance;
     }
 
     void Application::RegisterWindowClass() const

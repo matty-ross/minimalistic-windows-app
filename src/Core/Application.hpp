@@ -27,6 +27,6 @@ namespace Core
         const char* GetWindowClassName() const;
 
     private:
-        inline static Application* s_Instance = nullptr;
+        static Application s_Instance;
     };
 }

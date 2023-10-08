@@ -9,7 +9,7 @@ void Start()
     Core::Application::GetInstance().RegisterWindowClass();
 
     {
-        Core::Window mainWindow(
+        Core::Window window(
             {
                 .Name   = "Windows App",
                 .Style  = WS_OVERLAPPEDWINDOW,
@@ -20,8 +20,8 @@ void Start()
             }
         );
         
-        mainWindow.Show();
-        while (mainWindow.ProcessMessage())
+        window.Show();
+        while (window.ProcessMessage())
         {
         }
     }
