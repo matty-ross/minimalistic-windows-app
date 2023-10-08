@@ -17,5 +17,5 @@ $LinkerOptions =
 Remove-Item -Path ".\obj\*"
 & cl.exe $CompilerOptions (Get-ChildItem -Path ".\src\*" -Filter "*.cpp" -Recurse -File).FullName
 
-Remove-Item -Path ".\bin\*"
+Remove-Item -Path ".\bin\*" -Exclude "config.ini"
 & link.exe $LinkerOptions ".\obj\*"
