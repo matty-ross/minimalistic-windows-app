@@ -8,7 +8,7 @@ $CompilerOptions =
 $LinkerOptions =
 "/OUT:.\bin\windows_app.exe",
 "/ENTRY:Start",
-"/SUBSYSTEM:CONSOLE",
+"/SUBSYSTEM:WINDOWS",
 "/DEFAULTLIB:Kernel32.lib",
 "/DEFAULTLIB:User32.lib",
 ""

@@ -3,46 +3,55 @@
 #include "Application.hpp"
 
 
-Core::Window::Window(const WindowParams& windowParams)
+namespace Core
 {
-    m_WindowHandle = CreateWindowExA(
-        0,
-        Application::GetInstance().GetWindowClassName(),
-        windowParams.Name,
-        windowParams.Style,
-        windowParams.X,
-        windowParams.Y,
-        windowParams.Width,
-        windowParams.Height,
-        nullptr,
-        nullptr,
-        GetModuleHandleA(nullptr),
-        nullptr
-    );
-}
+    Window::Window(const WindowParams& windowParams)
+        :
+        m_WindowParams(windowParams)
+    {
+        m_ProcessThread = CreateThread(nullptr, 0, &Window::ProcessThreadProc, this, 0, nullptr);
+    }
 
-Core::Window::~Window()
-{
-    DestroyWindow(m_WindowHandle);
-}
+    Window::~Window()
+    {
+        WaitForSingleObject(m_ProcessThread, INFINITE);
+        CloseHandle(m_ProcessThread);
+    }
+    
+    DWORD Window::ProcessThreadProc(LPVOID lpThreadParameter)
+    {
+        Window& window = *static_cast<Window*>(lpThreadParameter);
 
-HWND Core::Window::GetWindowHandle() const
-{
-    return m_WindowHandle;
-}
+        HWND hwnd = CreateWindowExA(
+            0,
+            Core::Application::GetInstance().GetWindowClassName(),
+            window.m_WindowParams.Name,
+            window.m_WindowParams.Style,
+            window.m_WindowParams.X,
+            window.m_WindowParams.Y,
+            window.m_WindowParams.Width,
+            window.m_WindowParams.Height,
+            nullptr,
+            nullptr,
+            GetModuleHandleA(nullptr),
+            nullptr
+        );
+        ShowWindow(hwnd, SW_SHOW);
+        UpdateWindow(hwnd);
 
-void Core::Window::Show() const
-{
-    ShowWindow(m_WindowHandle, SW_SHOW);
-    UpdateWindow(m_WindowHandle);
-}
+        MSG msg = {};
+        while (GetMessageA(&msg, nullptr, 0, 0))
+        {
+            TranslateMessage(&msg);
+            DispatchMessageA(&msg);
 
-bool Core::Window::ProcessMessage() const
-{
-    MSG msg = {};
-    PeekMessageA(&msg, nullptr, 0, 0, PM_REMOVE);
-    TranslateMessage(&msg);
-    DispatchMessageA(&msg);
+            if (msg.message == WM_QUIT)
+            {
+                break;
+            }
+        }
 
-    return msg.message != WM_QUIT;
+        DestroyWindow(hwnd);
+        return msg.wParam;
+    }
 }

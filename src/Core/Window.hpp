@@ -28,12 +28,11 @@ namespace Core
         Window& operator =(const Window&) = delete;
         Window& operator =(Window&&) = delete;
 
-    public:
-        HWND GetWindowHandle() const;
-        void Show() const;
-        bool ProcessMessage() const;
+    private:
+        static DWORD ProcessThreadProc(LPVOID lpThreadParameter);
 
     private:
-        HWND m_WindowHandle = nullptr;
+        WindowParams m_WindowParams;
+        HANDLE m_ProcessThread = nullptr;
     };
 }

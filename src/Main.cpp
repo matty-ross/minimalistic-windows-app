@@ -4,16 +4,15 @@
 #include "Core/Window.hpp"
 
 
-static constexpr char k_ConfigFilePath[] = ".\\config.ini";
-
-
 void Start()
 {
-    Core::Application::GetInstance().RegisterWindowClass();
+    static constexpr char k_ConfigFilePath[] = ".\\config.ini";
 
+    Core::Application::GetInstance().RegisterWindowClass();
     {
         Core::Window window(
-            Core::WindowParams{
+            Core::WindowParams
+            {
                 .Name   = "Windows App",
                 .Style  = WS_OVERLAPPEDWINDOW,
                 .X      = static_cast<int>(GetPrivateProfileIntA("Window", "X", 100, k_ConfigFilePath)),
@@ -22,13 +21,7 @@ void Start()
                 .Height = static_cast<int>(GetPrivateProfileIntA("Window", "Height", 720, k_ConfigFilePath)),
             }
         );
-        
-        window.Show();
-        while (window.ProcessMessage())
-        {
-        }
     }
-
     Core::Application::GetInstance().UnregisterWindowClass();
 
     ExitProcess(0);
