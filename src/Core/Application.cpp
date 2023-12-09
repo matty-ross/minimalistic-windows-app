@@ -3,51 +3,73 @@
 
 namespace Core
 {
-    static constexpr char k_WindowClassName[] = "WindowsAppWindowClass";
+    static constexpr char k_ConfigFilePath[] = ".\\config.ini";
 
 
     Application Application::s_Instance;
 
 
-    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (Msg)
-        {
-        case WM_DESTROY:
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-        }
-
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
-
-    
     Application& Application::GetInstance()
     {
         return s_Instance;
     }
-
-    void Application::RegisterWindowClass() const
+    
+    void Application::Initialize()
     {
-        WNDCLASSA wndClass =
+        Window::RegisterWindowClass();
+
+        int n = 1;
+        for (Window& window : m_Windows)
         {
-            .lpfnWndProc   = WindowProc,
-            .hInstance     = GetModuleHandleA(nullptr),
-            .hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),
-            .lpszClassName = k_WindowClassName,
-        };
-        RegisterClassA(&wndClass);
+            char windowName[] = "Windows App # ";
+            windowName[sizeof(windowName) - 2] = n + '0';
+            ++n;
+            
+            window.Create(Core::WindowParams
+                {
+                    .Name   = windowName,
+                    .Style  = WS_OVERLAPPEDWINDOW,
+                    .X      = static_cast<int>(GetPrivateProfileIntA("Window", "X", 100, k_ConfigFilePath)),
+                    .Y      = static_cast<int>(GetPrivateProfileIntA("Window", "Y", 100, k_ConfigFilePath)),
+                    .Width  = static_cast<int>(GetPrivateProfileIntA("Window", "Width", 1280, k_ConfigFilePath)),
+                    .Height = static_cast<int>(GetPrivateProfileIntA("Window", "Height", 720, k_ConfigFilePath)),
+                }
+            );
+        }
+    }
+
+    void Application::Shutdown()
+    {
+        for (Window& window : m_Windows)
+        {
+            window.Destroy();
+        }
+
+        Window::UnregisterWindowClass();
+    }
+
+    bool Application::Run()
+    {
+        bool continueRunning = true;
+
+        MSG msg = {};
+        while (PeekMessageA(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessageA(&msg);
+
+            if (msg.message == WM_QUIT)
+            {
+                continueRunning = false;
+                break;
+            }
+        }
+
+        return continueRunning;
     }
     
-    void Application::UnregisterWindowClass() const
+    const Window& Application::GetMainWindow() const
     {
-        UnregisterClassA(k_WindowClassName, GetModuleHandleA(nullptr));
-    }
-
-    const char* Application::GetWindowClassName() const
-    {
-        return k_WindowClassName;
+        return m_Windows[0];
     }
 }

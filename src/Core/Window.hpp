@@ -20,19 +20,28 @@ namespace Core
     class Window
     {
     public:
-        Window(const WindowParams& windowParams);
-        ~Window();
+        Window() = default;
+        ~Window() = default;
 
         Window(const Window&) = delete;
         Window(Window&&) = delete;
         Window& operator =(const Window&) = delete;
         Window& operator =(Window&&) = delete;
 
-    private:
-        static DWORD ProcessThreadProc(LPVOID lpThreadParameter);
+    public:
+        static void RegisterWindowClass();
+        static void UnregisterWindowClass();
+
+    public:
+        HWND GetHandle() const;
+        
+        void Create(const WindowParams& windowParams);
+        void Destroy();
 
     private:
-        WindowParams m_WindowParams;
-        HANDLE m_ProcessThread = nullptr;
+        static LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+    private:
+        HWND m_Handle = nullptr;
     };
 }

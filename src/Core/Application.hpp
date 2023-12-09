@@ -3,6 +3,8 @@
 
 #include <Windows.h>
 
+#include "Window.hpp"
+
 
 namespace Core
 {
@@ -22,11 +24,16 @@ namespace Core
         static Application& GetInstance();
 
     public:
-        void RegisterWindowClass() const;
-        void UnregisterWindowClass() const;
-        const char* GetWindowClassName() const;
+        void Initialize();
+        void Shutdown();
+        bool Run();
+
+        const Window& GetMainWindow() const;
 
     private:
         static Application s_Instance;
+
+    private:
+        Window m_Windows[5];
     };
 }

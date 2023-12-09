@@ -5,53 +5,71 @@
 
 namespace Core
 {
-    Window::Window(const WindowParams& windowParams)
-        :
-        m_WindowParams(windowParams)
-    {
-        m_ProcessThread = CreateThread(nullptr, 0, &Window::ProcessThreadProc, this, 0, nullptr);
-    }
+    static constexpr char k_WindowClassName[] = "WindowsAppWindowClass";
 
-    Window::~Window()
+
+    void Window::RegisterWindowClass()
     {
-        WaitForSingleObject(m_ProcessThread, INFINITE);
-        CloseHandle(m_ProcessThread);
+        WNDCLASSA wndClass =
+        {
+            .lpfnWndProc   = &Window::WindowProc,
+            .hInstance     = GetModuleHandleA(nullptr),
+            .hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),
+            .lpszClassName = k_WindowClassName,
+        };
+        RegisterClassA(&wndClass);
     }
     
-    DWORD Window::ProcessThreadProc(LPVOID lpThreadParameter)
+    void Window::UnregisterWindowClass()
     {
-        Window& window = *static_cast<Window*>(lpThreadParameter);
+        UnregisterClassA(k_WindowClassName, GetModuleHandleA(nullptr));
+    }
 
-        HWND hwnd = CreateWindowExA(
+    HWND Window::GetHandle() const
+    {
+        return m_Handle;
+    }
+
+    void Window::Create(const WindowParams &windowParams)
+    {
+        m_Handle = CreateWindowExA(
             0,
-            Core::Application::GetInstance().GetWindowClassName(),
-            window.m_WindowParams.Name,
-            window.m_WindowParams.Style,
-            window.m_WindowParams.X,
-            window.m_WindowParams.Y,
-            window.m_WindowParams.Width,
-            window.m_WindowParams.Height,
+            k_WindowClassName,
+            windowParams.Name,
+            windowParams.Style,
+            windowParams.X,
+            windowParams.Y,
+            windowParams.Width,
+            windowParams.Height,
             nullptr,
             nullptr,
             GetModuleHandleA(nullptr),
             nullptr
         );
-        ShowWindow(hwnd, SW_SHOW);
-        UpdateWindow(hwnd);
+        
+        ShowWindow(m_Handle, SW_SHOW);
+        UpdateWindow(m_Handle);
+    }
 
-        MSG msg = {};
-        while (GetMessageA(&msg, nullptr, 0, 0))
+    void Window::Destroy()
+    {
+        DestroyWindow(m_Handle);
+    }
+
+    LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+    {
+        switch (Msg)
         {
-            TranslateMessage(&msg);
-            DispatchMessageA(&msg);
-
-            if (msg.message == WM_QUIT)
+        case WM_DESTROY:
             {
-                break;
+                HWND mainWindowHandle = Application::GetInstance().GetMainWindow().GetHandle();
+                if (hWnd == mainWindowHandle)
+                {
+                    PostQuitMessage(0);
+                }
             }
         }
 
-        DestroyWindow(hwnd);
-        return msg.wParam;
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
 }
